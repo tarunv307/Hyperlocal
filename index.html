@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description"
+    content="HyperLocal Delivery App - Get groceries, food, medicines & essentials delivered in 10 minutes from nearby stores." />
+  <meta name="theme-color" content="#2ECC71" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>HyperLocal Delivery</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/styles/index.css" />
+  <link rel="stylesheet" href="/src/styles/components.css" />
+  <link rel="stylesheet" href="/src/styles/pages.css" />
+</head>
+
+<body>
+  <!-- App Shell -->
+  <div id="app">
+    <!-- Top Status Bar (mobile) -->
+    <div id="status-bar"></div>
+
+    <!-- Main Content Area -->
+    <main id="page-container" class="page-container">
+      <!-- Pages rendered here by router -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="bottom-nav hidden">
+      <button class="nav-item active" data-page="home">
+        <span class="material-icons-round">home</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" data-page="search">
+        <span class="material-icons-round">search</span>
+        <span class="nav-label">Search</span>
+      </button>
+      <button class="nav-item" data-page="cart">
+        <span class="material-icons-round">shopping_cart</span>
+        <span class="nav-label">Cart</span>
+        <span class="cart-badge hidden" id="cart-badge">0</span>
+      </button>
+      <button class="nav-item" data-page="orders">
+        <span class="material-icons-round">receipt_long</span>
+        <span class="nav-label">Orders</span>
+      </button>
+      <button class="nav-item" data-page="profile">
+        <span class="material-icons-round">person</span>
+        <span class="nav-label">Profile</span>
+      </button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <p class="loading-text">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App Entry -->
+  <script type="module" src="/src/js/app.js"></script>
+</body>
+
+</html>
