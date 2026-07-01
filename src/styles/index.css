@@ -503,68 +503,80 @@ h6 { font-size: var(--fs-base); font-weight: var(--fw-medium); }
 @media (min-width: 1024px) {
   :root {
     --content-padding: 32px;
-    --bottom-nav-height: 0px;
+    --bottom-nav-height: 72px;
   }
 
   body {
     background: var(--surface);
   }
 
-  /* Desktop top navigation bar */
+  /* Desktop — keep nav at the bottom, wider pill layout */
   .bottom-nav {
     position: fixed;
-    top: 0;
-    bottom: auto;
-    left: 0;
-    right: 0;
-    transform: none;
-    max-width: 100%;
+    bottom: 0;
+    top: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: 680px;
     width: 100%;
     height: 72px;
-    border-top: none;
-    border-bottom: 1px solid var(--border-light);
+    border-top: 1px solid var(--border-light);
+    border-bottom: none;
+    border-radius: 24px 24px 0 0;
     background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 32px;
+    justify-content: space-around;
+    gap: 4px;
+    padding: 0 16px;
+    padding-bottom: var(--safe-area-bottom);
     z-index: var(--z-nav);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .bottom-nav.nav-hidden {
+    transform: translateX(-50%) translateY(100%);
   }
 
   .bottom-nav .nav-item {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 0 24px;
-    height: 48px;
-    border-radius: var(--radius-full);
-    min-width: auto;
+    gap: 4px;
+    padding: 8px 20px;
+    height: auto;
+    border-radius: var(--radius-md);
+    min-width: 64px;
   }
 
   .bottom-nav .nav-item.active {
     background: var(--primary-lighter);
   }
 
+  .bottom-nav .nav-item .material-icons-round {
+    font-size: 24px;
+  }
+
   .nav-label {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
   }
 
   .cart-badge {
-    top: 4px;
-    right: 12px;
+    top: 2px;
+    right: 14px;
   }
 
   .page-container {
-    padding-top: 80px;
-    padding-bottom: 32px;
+    padding-top: 24px;
+    padding-bottom: calc(72px + var(--safe-area-bottom) + 16px);
     max-width: 1200px;
     margin: 0 auto;
   }
 
   .page-container.no-bottom-nav {
     padding-top: 0;
+    padding-bottom: 32px;
     max-width: 100%;
   }
 
