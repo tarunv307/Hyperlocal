@@ -171,7 +171,7 @@ export function initCheckout() {
         id: 'ORD-' + Date.now().toString(36).toUpperCase(),
         items: [...appState.get('cart')],
         total: appState.getCartTotal() + CONFIG.PLATFORM_FEE + (appState.getCartTotal() >= CONFIG.FREE_DELIVERY_ABOVE ? 0 : CONFIG.DELIVERY_CHARGE),
-        status: 'confirmed',
+        status: 'pending',
         payment: selectedPayment,
         date: new Date().toISOString(),
         address: appState.get('currentAddress') || 'Bangalore, Karnataka',
@@ -183,13 +183,13 @@ export function initCheckout() {
       appState.set('activeOrder', order);
 
       appState.addNotification({
-        title: 'Order Placed! 🎉',
-        message: `Your order ${order.id} has been confirmed. Estimated delivery: ${order.estimatedTime}`,
+        title: 'Order Placed! ⏳',
+        message: `Your order ${order.id} is pending admin confirmation.`,
         type: 'order',
-        icon: 'check_circle'
+        icon: 'pending_actions'
       });
 
-      showToast('Order placed successfully! 🎉', 'success');
+      showToast('Order placed! Waiting for confirmation...', 'success');
       router.navigate('/order-tracking', { id: order.id });
     }, 1500);
   };

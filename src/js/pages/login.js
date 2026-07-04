@@ -66,6 +66,10 @@ export function renderLogin() {
         <div class="auth-footer">
           Don't have an account? <span class="link" onclick="window.location.hash='/register'">Sign Up</span>
         </div>
+        
+        <div style="margin-top: 16px; text-align: center; font-size: var(--fs-xs); color: var(--text-muted); background: var(--accent); padding: 8px; border-radius: var(--radius-sm);">
+          <strong>Demo Admin:</strong> admin@hyperlocal.com / admin123
+        </div>
       </div>
     </div>
   `;
@@ -107,6 +111,28 @@ export function initLogin() {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-ring" style="width:20px;height:20px;border-width:2px;"></span> Signing in...';
 
+      // Hardcoded Admin Credentials Check
+      if (email === 'admin@hyperlocal.com') {
+        if (password === 'admin123') {
+          appState.set('isLoggedIn', true);
+          appState.set('user', {
+            id: 'admin-user',
+            email: 'admin@hyperlocal.com',
+            name: 'Super Admin',
+            phone: '+91 99999 99999',
+            role: 'admin',
+            avatar: null
+          });
+          showToast('Welcome back, Admin! 🎉', 'success');
+          setTimeout(() => router.navigate('/admin/dashboard'), 500);
+        } else {
+          showToast('Invalid admin credentials', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-icons-round">login</span> Sign In';
+        }
+        return;
+      }
+
       try {
         const { data, error } = await signIn(email, password);
         if (error) {
@@ -138,7 +164,7 @@ export function initLogin() {
           email: email,
           name: email.split('@')[0],
           phone: '+91 98765 43210',
-          role: email.includes('admin') ? 'admin' : 'customer',
+          role: 'customer',
           avatar: null
         });
         showToast('Welcome! (Demo Mode) 🎉', 'success');

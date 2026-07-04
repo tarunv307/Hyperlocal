@@ -22,6 +22,34 @@ export function renderAdminDashboard() {
         </div>
       </div>
 
+      <!-- Admin Details Section -->
+      <div style="padding:16px; margin: 16px 16px 0; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-xs);">
+        <h4 style="font-family:var(--font-heading);font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <span class="material-icons-round" style="color:var(--primary);">admin_panel_settings</span>
+          Admin Profile & System Details
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: var(--fs-sm);">
+          <div>
+            <span style="color:var(--text-muted);">Admin Name:</span>
+            <div style="font-weight:500;">Super Admin</div>
+          </div>
+          <div>
+            <span style="color:var(--text-muted);">Email:</span>
+            <div style="font-weight:500;">admin@hyperlocal.com</div>
+          </div>
+          <div>
+            <span style="color:var(--text-muted);">System Status:</span>
+            <div style="font-weight:500; color: var(--success); display:flex; align-items:center; gap:4px;">
+              <span class="material-icons-round" style="font-size:14px;">check_circle</span> Online
+            </div>
+          </div>
+          <div>
+            <span style="color:var(--text-muted);">Last Login:</span>
+            <div style="font-weight:500;">Today, 08:45 AM</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Stats Grid -->
       <div class="admin-stats">
         <div class="admin-stat-card">
@@ -109,28 +137,80 @@ export function renderAdminDashboard() {
       </div>
 
       <!-- Recent Orders -->
-      <div class="admin-table-wrapper">
+      <div class="admin-table-wrapper" style="margin-bottom: 24px; padding-bottom: 24px;">
         <div class="admin-table-header">
-          <span class="admin-table-title">Recent Orders</span>
+          <span class="admin-table-title">Recent Orders Details</span>
           <span class="section-link" onclick="window.location.hash='/admin/orders'">View All</span>
         </div>
-        ${(orders.length > 0 ? orders.slice(0, 5) : [
-          { id: 'ORD-001', total: 450, status: 'delivered', date: new Date().toISOString() },
-          { id: 'ORD-002', total: 320, status: 'preparing', date: new Date().toISOString() },
-          { id: 'ORD-003', total: 180, status: 'confirmed', date: new Date().toISOString() },
-        ]).map(order => `
-          <div class="admin-table-row">
-            <div style="flex:1;">
-              <div style="font-weight:600;font-size:var(--fs-sm);">#${order.id}</div>
-              <div style="font-size:var(--fs-xs);color:var(--text-muted);">${new Date(order.date).toLocaleDateString()}</div>
-            </div>
-            <div style="font-weight:600;font-size:var(--fs-sm);">₹${order.total}</div>
-            <span class="badge ${order.status === 'delivered' ? 'badge-success' : order.status === 'preparing' ? 'badge-warning' : 'badge-info'}">${order.status}</span>
-          </div>
-        `).join('')}
+        
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--fs-sm); min-width: 600px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                <th style="padding: 12px 16px; font-weight: 500;">Order ID</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Date</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Customer</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Items</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Total</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Payment</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Status</th>
+                <th style="padding: 12px 16px; font-weight: 500;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(orders.length > 0 ? orders.slice(0, 5) : [
+                { id: 'ORD-001', total: 450, status: 'delivered', date: new Date().toISOString(), customer: 'Rahul Sharma', items: 4, payment: 'UPI' },
+                { id: 'ORD-002', total: 320, status: 'preparing', date: new Date().toISOString(), customer: 'Priya Patel', items: 2, payment: 'Card' },
+                { id: 'ORD-003', total: 180, status: 'confirmed', date: new Date().toISOString(), customer: 'Amit Singh', items: 1, payment: 'COD' },
+                { id: 'ORD-004', total: 850, status: 'pending', date: new Date().toISOString(), customer: 'Neha Gupta', items: 8, payment: 'UPI' },
+                { id: 'ORD-005', total: 120, status: 'delivered', date: new Date().toISOString(), customer: 'Vikram Reddy', items: 1, payment: 'Wallet' },
+              ]).map(order => `
+                <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='transparent'">
+                  <td style="padding: 12px 16px; font-weight: 600;">#${order.id}</td>
+                  <td style="padding: 12px 16px; color: var(--text-muted);">${new Date(order.date).toLocaleDateString()}</td>
+                  <td style="padding: 12px 16px;">${order.customer || (appState.get('user') ? appState.get('user').name : 'Guest User')}</td>
+                  <td style="padding: 12px 16px;">${order.items ? (Array.isArray(order.items) ? order.items.length : order.items) : 1} items</td>
+                  <td style="padding: 12px 16px; font-weight: 600;">₹${order.total}</td>
+                  <td style="padding: 12px 16px;">
+                    <span style="display:inline-block; padding:2px 8px; background:var(--accent); border-radius:4px; font-size:var(--fs-xs);">${order.payment || 'Online'}</span>
+                  </td>
+                  <td style="padding: 12px 16px;">
+                    <span class="badge ${order.status === 'delivered' ? 'badge-success' : order.status === 'preparing' ? 'badge-warning' : order.status === 'confirmed' ? 'badge-primary' : order.status === 'pending' ? 'badge-warning' : 'badge-info'}">
+                      ${order.status}
+                    </span>
+                  </td>
+                  <td style="padding: 12px 16px;">
+                    ${order.status === 'pending' 
+                      ? `<button class="btn btn-sm btn-primary" style="padding:4px 8px; font-size:12px;" onclick="window.confirmOrder('${order.id}')">Confirm</button>`
+                      : `<button class="btn btn-sm btn-ghost" style="padding:4px 8px;" disabled><span class="material-icons-round" style="font-size:18px;">check_circle</span></button>`
+                    }
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   `;
 }
 
-export function initAdminDashboard() {}
+export function initAdminDashboard() {
+  window.confirmOrder = function(orderId) {
+    appState.updateOrder(orderId, { status: 'confirmed' });
+    
+    // Notify user
+    appState.addNotification({
+      title: 'Order Confirmed! 🎉',
+      message: `Your order ${orderId} has been confirmed by the admin and is being prepared.`,
+      type: 'order',
+      icon: 'check_circle'
+    });
+
+    // We can also trigger a toast immediately for the admin
+    import('../../app.js').then(app => app.showToast('Order confirmed and user notified!', 'success'));
+
+    // Re-render dashboard
+    import('../../router.js').then(m => m.router.navigate('/admin/dashboard'));
+  };
+}
