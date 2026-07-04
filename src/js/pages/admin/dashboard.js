@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════
 
 import { appState } from '../../state.js';
+import { fetchData, updateData, listenForNewOrders } from '../../supabase.js';
 
 export function renderAdminDashboard() {
   const orders = appState.get('orders') || [];
@@ -167,7 +168,7 @@ export function renderAdminDashboard() {
               ]).map(order => `
                 <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='transparent'">
                   <td style="padding: 12px 16px; font-weight: 600;">#${order.id}</td>
-                  <td style="padding: 12px 16px; color: var(--text-muted);">${new Date(order.date).toLocaleDateString()}</td>
+                  <td style="padding: 12px 16px; color: var(--text-muted);">${new Date(order.created_at || order.date || Date.now()).toLocaleDateString()}</td>
                   <td style="padding: 12px 16px;">${order.customer || (appState.get('user') ? appState.get('user').name : 'Guest User')}</td>
                   <td style="padding: 12px 16px;">${order.items ? (Array.isArray(order.items) ? order.items.length : order.items) : 1} items</td>
                   <td style="padding: 12px 16px; font-weight: 600;">₹${order.total}</td>
@@ -195,11 +196,34 @@ export function renderAdminDashboard() {
   `;
 }
 
-export function initAdminDashboard() {
-  window.confirmOrder = function(orderId) {
+export async function initAdminDashboard() {
+  // Fetch initial orders
+  const { data, error } = await fetchData('orders', { order: { column: 'created_at', ascending: false } });
+  if (data) {
+    appState.set('orders', data);
+  }
+
+  // Setup real-time listener if not already active
+  if (!window.adminOrderListener) {
+    window.adminOrderListener = listenForNewOrders((newOrder) => {
+      appState.addOrder(newOrder);
+      import('../../app.js').then(app => app.showToast('New Order Received! 🚨', 'warning'));
+      import('../../router.js').then(m => m.router.handleRoute());
+    });
+  }
+
+  window.confirmOrder = async function(orderId) {
+    // Optimistic update locally
     appState.updateOrder(orderId, { status: 'confirmed' });
     
-    // Notify user
+    // Update in Supabase
+    const { error } = await updateData('orders', orderId, { status: 'confirmed' });
+    if (error) {
+      import('../../app.js').then(app => app.showToast('Failed to confirm order in database', 'error'));
+      return;
+    }
+    
+    // Notify user (mock notification for demo purposes locally)
     appState.addNotification({
       title: 'Order Confirmed! 🎉',
       message: `Your order ${orderId} has been confirmed by the admin and is being prepared.`,
@@ -207,10 +231,7 @@ export function initAdminDashboard() {
       icon: 'check_circle'
     });
 
-    // We can also trigger a toast immediately for the admin
     import('../../app.js').then(app => app.showToast('Order confirmed and user notified!', 'success'));
-
-    // Re-render dashboard
     import('../../router.js').then(m => m.router.navigate('/admin/dashboard'));
   };
 }

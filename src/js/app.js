@@ -103,6 +103,7 @@ function initApp() {
   initSupabase();
 
   // Initialize Router
+  window.appRouter = router;
   router.init('page-container');
 
   // ── Register Routes ─────────────────────────────────────

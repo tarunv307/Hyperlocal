@@ -36,6 +36,16 @@ class AppState {
 
     this.listeners = {};
     this.loadFromStorage();
+
+    // Listen for cross-tab storage events to simulate real-time updates
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'hyperlocal_state') {
+        this.loadFromStorage();
+        if (window.appRouter) {
+          window.appRouter.handleRoute();
+        }
+      }
+    });
   }
 
   get(key) {

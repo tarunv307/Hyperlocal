@@ -135,3 +135,27 @@ function mockUser(email, metadata = {}) {
     }
   };
 }
+
+// ── Real-Time ─────────────────────────────────────────────
+
+export function listenForNewOrders(callback) {
+  if (!supabaseClient) {
+    console.warn('⚠️ Supabase not initialized, cannot listen for real-time orders');
+    return null;
+  }
+  
+  console.log('📡 Starting real-time listener for orders table...');
+  const channel = supabaseClient
+    .channel('public:orders')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'orders' },
+      (payload) => {
+        console.log('🔔 New order received via real-time:', payload.new);
+        callback(payload.new);
+      }
+    )
+    .subscribe();
+    
+  return channel;
+}

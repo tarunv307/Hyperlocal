@@ -6,6 +6,7 @@ import { CONFIG } from '../config.js';
 import { appState } from '../state.js';
 import { router } from '../router.js';
 import { showToast } from '../app.js';
+import { insertData } from '../supabase.js';
 
 export function renderCheckout() {
   const cart = appState.get('cart');
@@ -161,36 +162,45 @@ export function initCheckout() {
     selectedPayment = method;
   };
 
-  window.placeOrder = function() {
+  window.placeOrder = async function() {
     const btn = document.getElementById('place-order-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-ring" style="width:20px;height:20px;border-width:2px;"></span> Placing Order...';
 
-    setTimeout(() => {
-      const order = {
-        id: 'ORD-' + Date.now().toString(36).toUpperCase(),
-        items: [...appState.get('cart')],
-        total: appState.getCartTotal() + CONFIG.PLATFORM_FEE + (appState.getCartTotal() >= CONFIG.FREE_DELIVERY_ABOVE ? 0 : CONFIG.DELIVERY_CHARGE),
-        status: 'pending',
-        payment: selectedPayment,
-        date: new Date().toISOString(),
-        address: appState.get('currentAddress') || 'Bangalore, Karnataka',
-        estimatedTime: CONFIG.ESTIMATED_DELIVERY_MINS + ' min',
-      };
+    const order = {
+      id: 'ORD-' + Date.now().toString(36).toUpperCase(),
+      items: [...appState.get('cart')],
+      total: appState.getCartTotal() + CONFIG.PLATFORM_FEE + (appState.getCartTotal() >= CONFIG.FREE_DELIVERY_ABOVE ? 0 : CONFIG.DELIVERY_CHARGE),
+      status: 'pending',
+      payment: selectedPayment,
+      address: appState.get('currentAddress') || 'Bangalore, Karnataka',
+      estimated_time: CONFIG.ESTIMATED_DELIVERY_MINS + ' min',
+      customer: appState.get('user') ? appState.get('user').name : 'Guest User'
+    };
 
-      appState.addOrder(order);
-      appState.clearCart();
-      appState.set('activeOrder', order);
+    // Insert to Supabase (this will trigger real-time signal)
+    const { error } = await insertData('orders', order);
 
-      appState.addNotification({
-        title: 'Order Placed! ⏳',
-        message: `Your order ${order.id} is pending admin confirmation.`,
-        type: 'order',
-        icon: 'pending_actions'
-      });
+    if (error) {
+      console.error('Error placing order:', error);
+      showToast('Failed to place order. Try again.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-icons-round">shopping_bag</span> Place Order';
+      return;
+    }
 
-      showToast('Order placed! Waiting for confirmation...', 'success');
-      router.navigate('/order-tracking', { id: order.id });
-    }, 1500);
+    appState.addOrder(order);
+    appState.clearCart();
+    appState.set('activeOrder', order);
+
+    appState.addNotification({
+      title: 'Order Placed! ⏳',
+      message: `Your order ${order.id} is pending admin confirmation.`,
+      type: 'order',
+      icon: 'pending_actions'
+    });
+
+    showToast('Order placed! Waiting for confirmation...', 'success');
+    router.navigate('/order-tracking', { id: order.id });
   };
 }

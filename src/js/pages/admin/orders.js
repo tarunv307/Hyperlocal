@@ -14,7 +14,7 @@ export function renderAdminOrders() {
     { id: 'ORD-A005', total: 455, status: 'cancelled', date: new Date(Date.now() - 259200000).toISOString(), items: [{name:'Soap'},{name:'Shampoo'}] },
   ];
 
-  const statusColors = { confirmed: 'badge-info', preparing: 'badge-warning', assigned: 'badge-warning', picked: 'badge-primary', delivered: 'badge-success', cancelled: 'badge-error' };
+  const statusColors = { pending: 'badge-warning', confirmed: 'badge-info', preparing: 'badge-warning', assigned: 'badge-warning', picked: 'badge-primary', delivered: 'badge-success', cancelled: 'badge-error' };
 
   return `
     <div id="admin-orders" class="admin-page" style="background:var(--surface);">
@@ -38,7 +38,7 @@ export function renderAdminOrders() {
           <div class="admin-table-row" style="padding:14px 20px;flex-wrap:wrap;">
             <div style="flex:1;min-width:120px;">
               <div style="font-weight:700;font-size:var(--fs-sm);">#${order.id}</div>
-              <div style="font-size:var(--fs-xs);color:var(--text-muted);">${new Date(order.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+              <div style="font-size:var(--fs-xs);color:var(--text-muted);">${new Date(order.created_at || order.date || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
               <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-top:2px;">${(order.items || []).map(i => i.name).join(', ')}</div>
             </div>
             <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
