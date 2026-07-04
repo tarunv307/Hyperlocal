@@ -167,19 +167,17 @@ export function initCheckout() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-ring" style="width:20px;height:20px;border-width:2px;"></span> Placing Order...';
 
-    const order = {
+    const orderPayload = {
       id: 'ORD-' + Date.now().toString(36).toUpperCase(),
       items: [...appState.get('cart')],
       total: appState.getCartTotal() + CONFIG.PLATFORM_FEE + (appState.getCartTotal() >= CONFIG.FREE_DELIVERY_ABOVE ? 0 : CONFIG.DELIVERY_CHARGE),
       status: 'pending',
-      payment: selectedPayment,
-      address: appState.get('currentAddress') || 'Bangalore, Karnataka',
-      estimated_time: CONFIG.ESTIMATED_DELIVERY_MINS + ' min',
-      customer: appState.get('user') ? appState.get('user').name : 'Guest User'
+      customer_id: appState.get('user') ? (appState.get('user').name || appState.get('user').email) : 'Guest User',
+      delivery_address: appState.get('currentAddress') || 'Bangalore, Karnataka'
     };
 
     // Insert to Supabase (this will trigger real-time signal)
-    const { error } = await insertData('orders', order);
+    const { error } = await insertData('orders', orderPayload);
 
     if (error) {
       console.error('Error placing order:', error);
@@ -189,13 +187,13 @@ export function initCheckout() {
       return;
     }
 
-    appState.addOrder(order);
+    appState.addOrder(orderPayload);
     appState.clearCart();
-    appState.set('activeOrder', order);
+    appState.set('activeOrder', orderPayload);
 
     appState.addNotification({
       title: 'Order Placed! ⏳',
-      message: `Your order ${order.id} is pending admin confirmation.`,
+      message: `Your order ${orderPayload.id} is pending admin confirmation.`,
       type: 'order',
       icon: 'pending_actions'
     });

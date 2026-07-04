@@ -157,7 +157,7 @@ export function renderAdminDashboard() {
                 <div style="font-size:var(--fs-xs);color:var(--text-muted);">${new Date(order.created_at || order.date || Date.now()).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
                 <div style="font-size:var(--fs-xs);color:var(--text);margin-top:4px;">
                   <span class="material-icons-round" style="font-size:14px;vertical-align:middle;color:var(--primary);">person</span> 
-                  ${order.customer || 'Guest User'}
+                  ${order.customer_id || 'Guest User'}
                 </div>
               </div>
               
