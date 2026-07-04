@@ -8,8 +8,8 @@ import { renderProductCard } from '../components/product-card.js';
 
 export function renderStore(params = {}) {
   const storeId = params.id || 's1';
-  const store = CONFIG.DEMO_STORES.find(s => s.id === storeId) || CONFIG.DEMO_STORES[0];
-  const products = CONFIG.DEMO_PRODUCTS.filter(p => p.storeId === storeId);
+  const store = appState.get('stores').find(s => s.id === storeId) || appState.get('stores')[0];
+  const products = appState.get('products').filter(p => p.storeId === storeId);
   const categories = [...new Set(products.map(p => p.category))];
 
   return `
@@ -85,7 +85,7 @@ export function initStore(params = {}) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     if (btn) btn.classList.add('active');
 
-    const products = CONFIG.DEMO_PRODUCTS.filter(p => {
+    const products = appState.get('products').filter(p => {
       if (p.storeId !== storeId) return false;
       if (category) return p.category === category;
       return true;

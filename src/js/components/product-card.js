@@ -53,7 +53,7 @@ export function renderProductCard(product) {
 
 // Global functions for cart and wishlist
 window.addToCart = function(productId) {
-  const product = CONFIG.DEMO_PRODUCTS.find(p => p.id === productId);
+  const product = appState.get('products').find(p => p.id === productId);
   if (!product) return;
   appState.addToCart(product);
   refreshProductCard(productId);
@@ -82,7 +82,7 @@ window.toggleWishlist = function(productId) {
 };
 
 function refreshProductCard(productId) {
-  const product = CONFIG.DEMO_PRODUCTS.find(p => p.id === productId);
+  const product = appState.get('products').find(p => p.id === productId);
   if (!product) return;
   const card = document.getElementById(`product-card-${productId}`);
   if (card) {

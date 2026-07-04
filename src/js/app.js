@@ -4,7 +4,7 @@
 
 import { router } from './router.js';
 import { appState } from './state.js';
-import { initSupabase } from './supabase.js';
+import { initSupabase, fetchData, listenForNewOrders } from './supabase.js';
 
 // ── Page Imports ──────────────────────────────────────────
 import { renderLogin, initLogin } from './pages/login.js';
@@ -95,12 +95,78 @@ function updateNavVisibility(path) {
     const page = item.getAttribute('data-page');
     item.classList.toggle('active', pageMap[path] === page);
   });
+
+  // Update Global Cart Bar visibility based on route
+  const cart = appState.get('cart') || [];
+  const bar = document.getElementById('global-cart-bar');
+  if (bar) {
+    if (cart.length > 0 && !['/cart', '/checkout', '/order-tracking'].includes(path) && !path.startsWith('/admin')) {
+      bar.classList.remove('hidden');
+    } else {
+      bar.classList.add('hidden');
+    }
+  }
 }
 
 // ── Initialize App ────────────────────────────────────────
 function initApp() {
   // Initialize Supabase
   initSupabase();
+
+  // Fetch dynamic catalog
+  fetchData('stores').then(({ data }) => {
+    if (data && data.length > 0) appState.set('stores', data);
+  });
+  fetchData('products').then(({ data }) => {
+    if (data && data.length > 0) appState.set('products', data);
+  });
+
+  // Global Real-Time Listener
+  listenForNewOrders((newOrder, eventType) => {
+    if (eventType === 'INSERT') {
+      appState.addOrder(newOrder);
+      if (appState.get('user') && appState.get('user').role === 'admin') {
+        showToast('New Order Received! 🚨', 'warning');
+      }
+    } else if (eventType === 'UPDATE') {
+      appState.updateOrder(newOrder.id, newOrder);
+      if (appState.get('user') && appState.get('user').role !== 'admin') {
+        showToast(`Order #${newOrder.id} status updated to ${newOrder.status}`, 'info');
+      }
+    }
+    if (window.appRouter) window.appRouter.handleRoute();
+  });
+
+  // Global Cart Bar Updates
+  appState.on('cart', (cart) => {
+    const bar = document.getElementById('global-cart-bar');
+    if (!bar) return;
+    
+    // Don't show cart bar if we are on checkout, cart, or admin pages
+    const path = window.location.hash.slice(1).split('?')[0] || '/home';
+    if (cart.length > 0 && !['/cart', '/checkout', '/order-tracking'].includes(path) && !path.startsWith('/admin')) {
+      const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      bar.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:rgba(0,0,0,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+            <span class="material-icons-round" style="font-size:20px;">shopping_bag</span>
+          </div>
+          <div>
+            <div style="font-size:12px;opacity:0.9;">${itemCount} item${itemCount > 1 ? 's' : ''}</div>
+            <div style="font-weight:700;font-size:14px;">₹${total}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;font-weight:600;font-size:14px;">
+          View Cart <span class="material-icons-round" style="font-size:18px;">chevron_right</span>
+        </div>
+      `;
+      bar.classList.remove('hidden');
+    } else {
+      bar.classList.add('hidden');
+    }
+  });
 
   // Initialize Router
   window.appRouter = router;

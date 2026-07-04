@@ -8,7 +8,7 @@ import { renderProductCard } from '../components/product-card.js';
 
 export function renderWishlist() {
   const wishlistIds = appState.get('wishlist') || [];
-  const products = CONFIG.DEMO_PRODUCTS.filter(p => wishlistIds.includes(p.id));
+  const products = appState.get('products').filter(p => wishlistIds.includes(p.id));
 
   return `
     <div id="wishlist-page">

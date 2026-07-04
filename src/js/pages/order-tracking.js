@@ -90,18 +90,23 @@ export function renderOrderTracking(params = {}) {
 
         <!-- Driver Info -->
         ${currentIdx >= 2 ? `
-          <div class="tracking-driver">
-            <div class="avatar">R</div>
-            <div class="tracking-driver-info">
-              <div class="tracking-driver-name">Rajesh Kumar</div>
-              <div class="tracking-driver-vehicle">Honda Activa • KA 01 AB 1234</div>
+          <div class="tracking-driver" style="display:flex;align-items:center;padding:16px;background:var(--surface);border-radius:var(--radius-xl);margin-top:16px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border:1px solid var(--border-light);">
+            <div class="avatar" style="width:48px;height:48px;border-radius:50%;background:#F0F0F0;overflow:hidden;margin-right:16px;">
+              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop" style="width:100%;height:100%;object-fit:cover;" />
             </div>
-            <div class="tracking-driver-actions">
-              <button class="tracking-driver-btn">
-                <span class="material-icons-round">call</span>
-              </button>
-              <button class="tracking-driver-btn">
+            <div class="tracking-driver-info" style="flex:1;">
+              <div class="tracking-driver-name" style="font-weight:700;font-size:var(--fs-md);margin-bottom:2px;">Rajesh Kumar</div>
+              <div class="tracking-driver-vehicle" style="font-size:var(--fs-xs);color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+                <span class="material-icons-round" style="font-size:14px;">two_wheeler</span> Honda Activa • KA 01 AB 1234
+              </div>
+              <div style="font-size:10px;color:var(--success);font-weight:600;margin-top:4px;">⭐ 4.9 (1k+ deliveries)</div>
+            </div>
+            <div class="tracking-driver-actions" style="display:flex;gap:12px;">
+              <button class="btn btn-ghost" style="width:40px;height:40px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background:#F0F4F8;color:var(--primary);">
                 <span class="material-icons-round">chat</span>
+              </button>
+              <button class="btn btn-primary" style="width:40px;height:40px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(46,204,113,0.3);">
+                <span class="material-icons-round">call</span>
               </button>
             </div>
           </div>
@@ -130,7 +135,6 @@ export function renderOrderTracking(params = {}) {
 
 export function initOrderTracking(params = {}) {
   initTrackingMap();
-  simulateTracking();
 }
 
 function initTrackingMap() {
@@ -138,6 +142,8 @@ function initTrackingMap() {
   if (!mapEl || !window.L) return;
 
   const loc = appState.get('currentLocation') || CONFIG.DEFAULT_LOCATION;
+  const order = appState.get('activeOrder') || appState.get('orders')?.[0];
+  if (!order) return;
   
   if (mapEl._leaflet_id) {
     mapEl.outerHTML = mapEl.outerHTML;
@@ -148,57 +154,47 @@ function initTrackingMap() {
   const map = L.map('tracking-map', {
     zoomControl: false,
     attributionControl: false
-  }).setView([loc.lat, loc.lng], 15);
+  }).setView([loc.lat + 0.002, loc.lng + 0.001], 15);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap &copy; CARTO'
   }).addTo(map);
 
+  // Determine driver position based on status
+  const statuses = ['pending', 'confirmed', 'preparing', 'assigned', 'picked', 'delivered'];
+  const currentIdx = Math.max(0, statuses.indexOf(order.status || 'confirmed'));
+  
+  let driverLat = loc.lat + 0.005;
+  let driverLng = loc.lng + 0.003;
+  
+  if (currentIdx >= 4 && currentIdx < 5) {
+    // Picked (halfway)
+    driverLat = loc.lat + 0.0025;
+    driverLng = loc.lng + 0.0015;
+  } else if (currentIdx >= 5) {
+    // Delivered
+    driverLat = loc.lat;
+    driverLng = loc.lng;
+  }
+
   // Delivery marker
   const deliveryIcon = L.divIcon({
     className: 'custom-div-icon',
-    html: `<div style="width:20px;height:20px;background:#E74C3C;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13]
+    html: `<div style="width:24px;height:24px;background:#2ECC71;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;"><span class="material-icons-round" style="font-size:14px;color:white;">two_wheeler</span></div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15]
   });
-  L.marker([loc.lat + 0.005, loc.lng + 0.003], { icon: deliveryIcon }).bindPopup('Delivery Partner').addTo(map);
+  
+  if (currentIdx >= 2) { // Only show driver if assigned/picked/delivered
+    L.marker([driverLat, driverLng], { icon: deliveryIcon }).bindPopup('Delivery Partner').addTo(map);
+  }
 
   // User marker
   const userIcon = L.divIcon({
     className: 'custom-div-icon',
-    html: `<div style="width:20px;height:20px;background:#2ECC71;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13]
+    html: `<div style="width:16px;height:16px;background:#3498DB;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11]
   });
   L.marker([loc.lat, loc.lng], { icon: userIcon }).bindPopup('Your Location').addTo(map);
-}
-
-function simulateTracking() {
-  const order = appState.get('activeOrder');
-  if (!order) return;
-
-  const statuses = ['confirmed', 'preparing', 'assigned', 'picked', 'delivered'];
-  let idx = statuses.indexOf(order.status || 'confirmed');
-  const etaEl = document.getElementById('tracking-eta');
-
-  const interval = setInterval(() => {
-    idx++;
-    if (idx >= statuses.length) {
-      clearInterval(interval);
-      if (etaEl) etaEl.textContent = 'Delivered! 🎉';
-      return;
-    }
-    
-    appState.set('activeOrder', { ...appState.get('activeOrder'), status: statuses[idx] });
-    const times = [10, 8, 5, 2, 0];
-    if (etaEl) etaEl.textContent = times[idx] > 0 ? times[idx] + ' min' : 'Delivered! 🎉';
-
-    // Update progress steps
-    const steps = document.querySelectorAll('.progress-step');
-    steps.forEach((step, i) => {
-      step.classList.remove('completed', 'active');
-      if (i < idx) step.classList.add('completed');
-      if (i === idx) step.classList.add('active');
-    });
-  }, 5000);
 }

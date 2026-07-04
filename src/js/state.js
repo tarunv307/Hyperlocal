@@ -3,12 +3,18 @@
 // Reactive state with LocalStorage persistence
 // ═══════════════════════════════════════════════════════════
 
+import { CONFIG } from './config.js';
+
 class AppState {
   constructor() {
     this.state = {
       // Auth
       isLoggedIn: false,
       user: null,
+
+      // Data (fallback to demo if db not loaded)
+      products: [...CONFIG.DEMO_PRODUCTS],
+      stores: [...CONFIG.DEMO_STORES],
 
       // Location
       currentLocation: null,

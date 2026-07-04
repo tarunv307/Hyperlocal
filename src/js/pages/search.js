@@ -87,7 +87,7 @@ export function initSearch(params = {}) {
 }
 
 function filterAndRender(query, categoryId) {
-  let products = CONFIG.DEMO_PRODUCTS;
+  let products = appState.get('products');
   
   if (categoryId) {
     products = products.filter(p => p.category === categoryId);

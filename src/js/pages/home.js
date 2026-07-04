@@ -10,10 +10,10 @@ import { renderProductCard } from '../components/product-card.js';
 export function renderHome() {
   const user = appState.get('user');
   const address = appState.get('currentAddress') || 'Detecting your location...';
-  const stores = CONFIG.DEMO_STORES;
+  const stores = appState.get('stores');
   const offers = CONFIG.DEMO_OFFERS;
   const categories = CONFIG.CATEGORIES;
-  const products = CONFIG.DEMO_PRODUCTS;
+  const products = appState.get('products');
 
   // Popular products (random selection)
   const popularProducts = products.sort(() => 0.5 - Math.random()).slice(0, 6);
@@ -231,7 +231,7 @@ function initHomeMap() {
     L.marker([loc.lat, loc.lng], { icon: userIcon }).addTo(map);
 
     // Store markers
-    CONFIG.DEMO_STORES.forEach((store, i) => {
+    appState.get('stores').forEach((store, i) => {
       const offset = (i + 1) * 0.003;
       const storeLat = loc.lat + offset * (i % 2 ? 1 : -1);
       const storeLng = loc.lng + offset * (i % 2 ? -1 : 1);

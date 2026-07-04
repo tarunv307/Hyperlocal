@@ -140,56 +140,45 @@ export function renderAdminDashboard() {
       <!-- Recent Orders -->
       <div class="admin-table-wrapper" style="margin-bottom: 24px; padding-bottom: 24px;">
         <div class="admin-table-header">
-          <span class="admin-table-title">Recent Orders Details</span>
+          <span class="admin-table-title">Recent Orders</span>
           <span class="section-link" onclick="window.location.hash='/admin/orders'">View All</span>
         </div>
         
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--fs-sm); min-width: 600px;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
-                <th style="padding: 12px 16px; font-weight: 500;">Order ID</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Date</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Customer</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Items</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Total</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Payment</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Status</th>
-                <th style="padding: 12px 16px; font-weight: 500;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${(orders.length > 0 ? orders.slice(0, 5) : [
-                { id: 'ORD-001', total: 450, status: 'delivered', date: new Date().toISOString(), customer: 'Rahul Sharma', items: 4, payment: 'UPI' },
-                { id: 'ORD-002', total: 320, status: 'preparing', date: new Date().toISOString(), customer: 'Priya Patel', items: 2, payment: 'Card' },
-                { id: 'ORD-003', total: 180, status: 'confirmed', date: new Date().toISOString(), customer: 'Amit Singh', items: 1, payment: 'COD' },
-                { id: 'ORD-004', total: 850, status: 'pending', date: new Date().toISOString(), customer: 'Neha Gupta', items: 8, payment: 'UPI' },
-                { id: 'ORD-005', total: 120, status: 'delivered', date: new Date().toISOString(), customer: 'Vikram Reddy', items: 1, payment: 'Wallet' },
-              ]).map(order => `
-                <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='transparent'">
-                  <td style="padding: 12px 16px; font-weight: 600;">#${order.id}</td>
-                  <td style="padding: 12px 16px; color: var(--text-muted);">${new Date(order.created_at || order.date || Date.now()).toLocaleDateString()}</td>
-                  <td style="padding: 12px 16px;">${order.customer || (appState.get('user') ? appState.get('user').name : 'Guest User')}</td>
-                  <td style="padding: 12px 16px;">${order.items ? (Array.isArray(order.items) ? order.items.length : order.items) : 1} items</td>
-                  <td style="padding: 12px 16px; font-weight: 600;">₹${order.total}</td>
-                  <td style="padding: 12px 16px;">
-                    <span style="display:inline-block; padding:2px 8px; background:var(--accent); border-radius:4px; font-size:var(--fs-xs);">${order.payment || 'Online'}</span>
-                  </td>
-                  <td style="padding: 12px 16px;">
-                    <span class="badge ${order.status === 'delivered' ? 'badge-success' : order.status === 'preparing' ? 'badge-warning' : order.status === 'confirmed' ? 'badge-primary' : order.status === 'pending' ? 'badge-warning' : 'badge-info'}">
-                      ${order.status}
-                    </span>
-                  </td>
-                  <td style="padding: 12px 16px;">
-                    ${order.status === 'pending' 
-                      ? `<button class="btn btn-sm btn-primary" style="padding:4px 8px; font-size:12px;" onclick="window.confirmOrder('${order.id}')">Confirm</button>`
-                      : `<button class="btn btn-sm btn-ghost" style="padding:4px 8px;" disabled><span class="material-icons-round" style="font-size:18px;">check_circle</span></button>`
-                    }
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+        <div style="display:flex;flex-direction:column;">
+          ${(orders.length > 0 ? orders.slice(0, 5) : [
+            { id: 'ORD-001', total: 450, status: 'delivered', date: new Date().toISOString(), customer: 'Rahul Sharma', items: [{name: 'Bananas'}], payment: 'UPI' },
+            { id: 'ORD-002', total: 320, status: 'preparing', date: new Date().toISOString(), customer: 'Priya Patel', items: [{name: 'Milk'}], payment: 'Card' },
+            { id: 'ORD-003', total: 180, status: 'confirmed', date: new Date().toISOString(), customer: 'Amit Singh', items: [{name: 'Bread'}], payment: 'COD' },
+            { id: 'ORD-004', total: 850, status: 'pending', date: new Date().toISOString(), customer: 'Neha Gupta', items: [{name: 'Rice'}], payment: 'UPI' },
+          ]).map(order => `
+            <div class="admin-table-row" style="padding:14px 20px;flex-wrap:wrap;border-bottom:1px solid var(--border-light);gap:12px;align-items:center;">
+              <div style="flex:1;min-width:140px;">
+                <div style="font-weight:700;font-size:var(--fs-sm);">#${order.id}</div>
+                <div style="font-size:var(--fs-xs);color:var(--text-muted);">${new Date(order.created_at || order.date || Date.now()).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                <div style="font-size:var(--fs-xs);color:var(--text);margin-top:4px;">
+                  <span class="material-icons-round" style="font-size:14px;vertical-align:middle;color:var(--primary);">person</span> 
+                  ${order.customer || 'Guest User'}
+                </div>
+              </div>
+              
+              <div style="flex:1;min-width:100px;">
+                <div style="font-size:var(--fs-xs);color:var(--text-muted);">${order.items ? (Array.isArray(order.items) ? order.items.map(i => i.name).join(', ') : order.items + ' items') : 'Items'}</div>
+                <div style="font-weight:600;font-size:var(--fs-sm);margin-top:4px;">₹${order.total} <span style="font-size:10px;font-weight:normal;color:var(--text-muted);">(${order.payment || 'Online'})</span></div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                <span class="badge ${order.status === 'delivered' ? 'badge-success' : order.status === 'preparing' ? 'badge-warning' : order.status === 'confirmed' ? 'badge-primary' : order.status === 'pending' ? 'badge-warning' : 'badge-info'}">
+                  ${order.status}
+                </span>
+                ${order.status === 'pending' 
+                  ? `<button class="btn btn-sm btn-primary" style="padding:4px 12px; font-size:12px; border-radius:100px;" onclick="window.updateOrderStatus('${order.id}', 'confirmed')">Confirm</button>`
+                  : order.status === 'confirmed' 
+                  ? `<button class="btn btn-sm btn-success" style="padding:4px 12px; font-size:12px; border-radius:100px; background:var(--success); color:white; border:none;" onclick="window.updateOrderStatus('${order.id}', 'delivered')">Deliver</button>`
+                  : `<button class="btn btn-sm btn-ghost" style="padding:4px 8px; color:var(--text-muted);" disabled><span class="material-icons-round" style="font-size:18px;">check_circle</span></button>`
+                }
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     </div>
@@ -203,35 +192,37 @@ export async function initAdminDashboard() {
     appState.set('orders', data);
   }
 
-  // Setup real-time listener if not already active
-  if (!window.adminOrderListener) {
-    window.adminOrderListener = listenForNewOrders((newOrder) => {
-      appState.addOrder(newOrder);
-      import('../../app.js').then(app => app.showToast('New Order Received! 🚨', 'warning'));
-      import('../../router.js').then(m => m.router.handleRoute());
-    });
-  }
-
-  window.confirmOrder = async function(orderId) {
+  // Setup real-time listener (now handled globally in app.js for all users)
+  
+  window.updateOrderStatus = async function(orderId, newStatus) {
     // Optimistic update locally
-    appState.updateOrder(orderId, { status: 'confirmed' });
+    appState.updateOrder(orderId, { status: newStatus });
     
     // Update in Supabase
-    const { error } = await updateData('orders', orderId, { status: 'confirmed' });
+    const { error } = await updateData('orders', orderId, { status: newStatus });
     if (error) {
-      import('../../app.js').then(app => app.showToast('Failed to confirm order in database', 'error'));
+      import('../../app.js').then(app => app.showToast('Failed to update order in database', 'error'));
       return;
     }
     
-    // Notify user (mock notification for demo purposes locally)
-    appState.addNotification({
-      title: 'Order Confirmed! 🎉',
-      message: `Your order ${orderId} has been confirmed by the admin and is being prepared.`,
-      type: 'order',
-      icon: 'check_circle'
-    });
+    if (newStatus === 'confirmed') {
+      appState.addNotification({
+        title: 'Order Confirmed! 🎉',
+        message: `Your order ${orderId} has been confirmed by the admin and is being prepared.`,
+        type: 'order',
+        icon: 'check_circle'
+      });
+      import('../../app.js').then(app => app.showToast('Order confirmed!', 'success'));
+    } else if (newStatus === 'delivered') {
+      appState.addNotification({
+        title: 'Order Delivered! 📦',
+        message: `Your order ${orderId} has been successfully delivered.`,
+        type: 'order',
+        icon: 'local_shipping'
+      });
+      import('../../app.js').then(app => app.showToast('Order marked as delivered!', 'success'));
+    }
 
-    import('../../app.js').then(app => app.showToast('Order confirmed and user notified!', 'success'));
     import('../../router.js').then(m => m.router.navigate('/admin/dashboard'));
   };
 }

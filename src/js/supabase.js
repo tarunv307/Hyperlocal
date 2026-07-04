@@ -28,60 +28,41 @@ export function getSupabase() {
 // ── Auth Functions ────────────────────────────────────────
 
 export async function signUp(email, password, metadata = {}) {
-  if (!supabaseClient) return { data: mockUser(email, metadata), error: null };
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
-    options: { data: metadata }
-  });
-  return { data, error };
+  // Always mock auth for demo purposes
+  return { data: mockUser(email, metadata), error: null };
 }
 
 export async function signIn(email, password) {
-  if (!supabaseClient) return { data: { user: mockUser(email) }, error: null };
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  return { data, error };
+  // Always mock auth for demo purposes
+  return { data: { user: mockUser(email) }, error: null };
 }
 
 export async function signInWithPhone(phone) {
-  if (!supabaseClient) return { data: { user: null }, error: null };
-  const { data, error } = await supabaseClient.auth.signInWithOtp({ phone });
-  return { data, error };
+  return { data: { user: mockUser(phone) }, error: null };
 }
 
 export async function verifyOTP(phone, token) {
-  if (!supabaseClient) return { data: { user: mockUser(phone) }, error: null };
-  const { data, error } = await supabaseClient.auth.verifyOtp({ phone, token, type: 'sms' });
-  return { data, error };
+  return { data: { user: mockUser(phone) }, error: null };
 }
 
 export async function signInWithGoogle() {
-  if (!supabaseClient) return { data: { user: mockUser('google@user.com') }, error: null };
-  const { data, error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
-  return { data, error };
+  return { data: { user: mockUser('google@user.com') }, error: null };
 }
 
 export async function signOut() {
-  if (!supabaseClient) return { error: null };
-  const { error } = await supabaseClient.auth.signOut();
-  return { error };
+  return { error: null };
 }
 
 export async function resetPassword(email) {
-  if (!supabaseClient) return { data: {}, error: null };
-  const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email);
-  return { data, error };
+  return { data: {}, error: null };
 }
 
 export async function getUser() {
-  if (!supabaseClient) return null;
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  return user;
+  return null;
 }
 
 export function onAuthStateChange(callback) {
-  if (!supabaseClient) return { data: { subscription: { unsubscribe: () => {} } } };
-  return supabaseClient.auth.onAuthStateChange(callback);
+  return { data: { subscription: { unsubscribe: () => {} } } };
 }
 
 // ── Database Functions ────────────────────────────────────
@@ -149,10 +130,14 @@ export function listenForNewOrders(callback) {
     .channel('public:orders')
     .on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'orders' },
+      { event: '*', schema: 'public', table: 'orders' },
       (payload) => {
-        console.log('🔔 New order received via real-time:', payload.new);
-        callback(payload.new);
+        if (payload.eventType === 'INSERT') {
+          console.log('🔔 New order received via real-time:', payload.new);
+        } else if (payload.eventType === 'UPDATE') {
+          console.log('🔄 Order updated via real-time:', payload.new);
+        }
+        callback(payload.new, payload.eventType);
       }
     )
     .subscribe();
