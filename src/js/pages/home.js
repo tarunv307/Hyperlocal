@@ -168,12 +168,14 @@ function detectLocation() {
         const { latitude, longitude } = position.coords;
         appState.set('currentLocation', { lat: latitude, lng: longitude });
         reverseGeocode(latitude, longitude);
+        initHomeMap(); // Re-center map to actual location
       },
       () => {
         appState.set('currentLocation', CONFIG.DEFAULT_LOCATION);
         const el = document.getElementById('home-address');
         if (el) el.textContent = 'Bangalore, Karnataka';
         appState.set('currentAddress', 'Bangalore, Karnataka');
+        initHomeMap(); // Re-center map to default
       }
     );
   }
