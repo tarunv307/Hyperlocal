@@ -16,7 +16,7 @@ export function renderProductCard(product) {
         ${product.image && product.image.startsWith('http') 
           ? `<img src="${product.image}" alt="${product.name}" loading="lazy" 
                   onerror="this.style.display='none';this.parentElement.textContent='${product.image}'" />`
-          : `<span style="font-size:48px;">${product.image || '📦'}</span>`
+          : `<span style="font-size:96px;">${product.image || '📦'}</span>`
         }
         <div class="product-card-wishlist ${isWishlisted ? 'active' : ''}" 
              onclick="event.stopPropagation();window.toggleWishlist('${product.id}')">
