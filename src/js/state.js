@@ -225,21 +225,13 @@ class AppState {
 
   reset() {
     this.state = {
+      ...this.state,
       isLoggedIn: false,
       user: null,
-      currentLocation: null,
-      currentAddress: '',
       cart: [],
-      wishlist: [],
-      orders: [],
       activeOrder: null,
-      notifications: [],
-      unreadCount: 0,
-      selectedStore: null,
-      searchQuery: '',
-      selectedCategory: null,
     };
-    localStorage.removeItem('hyperlocal_state');
+    this.saveToStorage();
     this.updateCartBadge();
   }
 }
