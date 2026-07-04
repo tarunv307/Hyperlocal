@@ -171,13 +171,21 @@ function detectLocation() {
         initHomeMap(); // Re-center map to actual location
       },
       () => {
-        appState.set('currentLocation', CONFIG.DEFAULT_LOCATION);
+        appState.set('currentLocation', null);
         const el = document.getElementById('home-address');
-        if (el) el.textContent = 'Bangalore, Karnataka';
-        appState.set('currentAddress', 'Bangalore, Karnataka');
-        initHomeMap(); // Re-center map to default
-      }
+        if (el) el.textContent = 'Select your location';
+        appState.set('currentAddress', 'Select your location');
+        initHomeMap();
+      },
+      { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
     );
+  } else {
+    // Fallback for insecure context or unsupported browsers
+    appState.set('currentLocation', null);
+    const el = document.getElementById('home-address');
+    if (el) el.textContent = 'Select your location';
+    appState.set('currentAddress', 'Select your location');
+    initHomeMap();
   }
 }
 
@@ -195,8 +203,8 @@ function reverseGeocode(lat, lng) {
     })
     .catch(() => {
       const el = document.getElementById('home-address');
-      if (el) el.textContent = 'Bangalore, Karnataka';
-      appState.set('currentAddress', 'Bangalore, Karnataka');
+      if (el) el.textContent = 'Location Found';
+      appState.set('currentAddress', 'Location Found');
     });
 }
 
@@ -205,13 +213,18 @@ function initHomeMap() {
   if (!mapEl) return;
 
   if (window.L) {
-    const loc = appState.get('currentLocation') || CONFIG.DEFAULT_LOCATION;
+    const loc = appState.get('currentLocation');
     
     // Clear any existing map instance before creating a new one
     if (mapEl._leaflet_id) {
       mapEl.outerHTML = mapEl.outerHTML; // simple way to clear the container
       initHomeMap(); // recursive call after DOM reset
       return;
+    }
+
+    if (!loc) {
+       mapEl.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text-muted);font-size:var(--fs-sm);padding:20px;text-align:center;cursor:pointer;" onclick="window.location.hash='/addresses'">Please tap here to select your delivery location 📍</div>`;
+       return;
     }
 
     const map = L.map('home-map', {
