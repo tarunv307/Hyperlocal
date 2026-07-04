@@ -34,19 +34,19 @@ export async function signUp(email, password, metadata = {}) {
 
 export async function signIn(email, password) {
   // Always mock auth for demo purposes
-  return { data: { user: mockUser(email) }, error: null };
+  return { data: mockUser(email), error: null };
 }
 
 export async function signInWithPhone(phone) {
-  return { data: { user: mockUser(phone) }, error: null };
+  return { data: mockUser(phone), error: null };
 }
 
 export async function verifyOTP(phone, token) {
-  return { data: { user: mockUser(phone) }, error: null };
+  return { data: mockUser(phone), error: null };
 }
 
 export async function signInWithGoogle() {
-  return { data: { user: mockUser('google@user.com') }, error: null };
+  return { data: mockUser('google@user.com'), error: null };
 }
 
 export async function signOut() {
