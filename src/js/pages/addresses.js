@@ -61,10 +61,14 @@ export function initAddresses() {
       navigator.geolocation.getCurrentPosition((pos) => {
         appState.set('currentLocation', { lat: pos.coords.latitude, lng: pos.coords.longitude });
         showToast('Location updated! 📍', 'success');
+      }, (err) => {
+        appState.set('currentLocation', { lat: 12.9716, lng: 77.5946 });
+        appState.set('currentAddress', 'Bangalore, Karnataka');
+        showToast('Using default location (Bangalore) 📍', 'info');
         window.history.back();
-      }, () => {
-        showToast('Location access denied', 'error');
       });
+    } else {
+      showToast('Geolocation not supported on this device', 'error');
     }
   };
 }

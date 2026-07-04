@@ -180,9 +180,9 @@ function initTrackingMap() {
   // Delivery marker
   const deliveryIcon = L.divIcon({
     className: 'custom-div-icon',
-    html: `<div style="width:24px;height:24px;background:#2ECC71;border:3px solid #FFF;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;"><span class="material-icons-round" style="font-size:14px;color:white;">two_wheeler</span></div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
+    html: `<div style="width:40px;height:40px;background:#FFF;border:2px solid #2ECC71;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:24px;">🛵</div>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22]
   });
   
   if (currentIdx >= 2) { // Only show driver if assigned/picked/delivered
