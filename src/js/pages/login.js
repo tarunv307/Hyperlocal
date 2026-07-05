@@ -18,6 +18,10 @@ export function renderLogin() {
         </div>
         <h1 class="auth-title">Welcome Back!</h1>
         <p class="auth-subtitle">Sign in to get your essentials delivered fast</p>
+        <div class="quick-login-options" style="display: flex; gap: 10px; justify-content: center; margin-top: 16px;">
+          <button type="button" id="quick-user-btn" class="btn btn-outline btn-sm" style="border-radius: 20px; font-size: 12px; padding: 6px 12px;">👤 Login as User</button>
+          <button type="button" id="quick-admin-btn" class="btn btn-outline btn-sm" style="border-radius: 20px; font-size: 12px; padding: 6px 12px;">🛡️ Login as Admin</button>
+        </div>
       </div>
 
       <div class="auth-card">
@@ -79,6 +83,24 @@ export function initLogin() {
   const form = document.getElementById('login-form');
   const togglePass = document.getElementById('toggle-password');
   const googleBtn = document.getElementById('google-login-btn');
+  const quickUserBtn = document.getElementById('quick-user-btn');
+  const quickAdminBtn = document.getElementById('quick-admin-btn');
+
+  if (quickUserBtn) {
+    quickUserBtn.addEventListener('click', () => {
+      document.getElementById('login-email').value = 'user@demo.com';
+      document.getElementById('login-password').value = 'user123';
+      // User has to click 'Sign In' manually
+    });
+  }
+
+  if (quickAdminBtn) {
+    quickAdminBtn.addEventListener('click', () => {
+      document.getElementById('login-email').value = 'admin@hyperlocal.com';
+      document.getElementById('login-password').value = 'admin123';
+      // User has to click 'Sign In' manually
+    });
+  }
 
   // Toggle password visibility
   if (togglePass) {
